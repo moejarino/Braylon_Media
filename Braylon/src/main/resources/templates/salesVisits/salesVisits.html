@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="css/master.css"/>
+        <style>
+          h1, th, td{
+            text-align: center;
+            color: #01233F;
+          }
+          label, input {
+            color: #01233F;
+          }
+          label{
+            font-weight: bold;
+          }
+          input, select{
+            padding-left: 5px;
+            border-radius: 5px;
+            height: 35px;
+          }
+        </style>
+        <title>Braylon: Sales</title>
+    </head>
+    <body>
+        <div class="container">
+		<!-------------------navigation bar------------------->
+		      <div class="navbar col-12">
+              <div class="nav-item col-md-3">
+                <a class="homeNav" th:href="dashboard"><image class="homeImg" src="img/braylonLogo.png"/></a>
+              </div>
+              <div class="nav-item col-md-2">
+                <a class="adminNav" th:href="admin"><button class="navBtn" type="submit" id="adminBtn" name="adminBtn">
+                  Admin</button></a>
+              </div>
+              <div class="nav-item col-md-2">
+                <a class="customerNav" th:href="customers"><button class="navBtn" type="submit" id="customerBtn" name="customerBtn">
+                  Customers</button></a>
+              </div>
+              <div class="nav-item col-md-2">
+                <a class="orderNav" th:href="customerOrders"><button class="navBtn" type="submit" id="orderBtn" name="orderBtn">
+                  Orders</button></a>
+              </div>
+              <div class="nav-item col-md-2">
+                <a class="visitsNav" th:href="salesVisits"><button class="navBtn" type="submit" id="visitBtn" name="visitBtn">
+                  Visits</button></a>
+              </div>
+              <div class="col-md-12">
+                <p style="text-align: center; font-style: italic; color: #8DCAFF">You might find...you'll get what you need.</p>
+              </div>
+            </div>
+            <br>
+            <br>
+			<!-------------- Table data Section ---------------->
+      			<div class="frame1 col-md-12" >
+              <h1>Schedule New Sales Visits</h1>
+              <br>
+      			<form type="form" action="newVisit" method="POST" autocomplete="off">
+                            <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+              <input type="hidden" id="employee" name="employee" th:value="${employee.employee_id}"/>
+              <div class="form-row col-md-12">
+                <div class="form-item col-md-6" align="right">
+                  <label style="font-height: 15px;">Customer:</label>
+                  <select style="width: 75%;" id="customer" name="customer" required>
+                    <option disabled selected>--Select--</option>
+                    <option th:each="customer : ${customers}"
+                            th:value="${customer.customer_id}"
+                            th:text="${customer.company + ' -- ' + customer.contact}">Customer</option>
+                  </select>
+                </div>
+                <div class="form-item col-md-6" align="right">
+                  <label style="font-height: 15px;">Purpose:</label>
+                  <select style="width: 75%;" id="purpose" name="purpose" required>
+                    <option disabled selected>--Select--</option>
+                    <option th:each="visitPurpose : ${visitPurposes}"
+                            th:value="${visitPurpose.purpose_id}"
+                            th:text="${visitPurpose.purpose_name}">Purpose</option>
+                  </select>
+                </div>
+              </div>
+              <br>
+              <div class="form-row col-md-12">
+                <div class="form-item col-md-6" align="right">
+                  <label style="font-height: 15px;">Date:</label>
+                  <input style="width:75%;" type="date" id="visitDate" name="visitDate" th:value="${salesVisit.visit_date}"/>
+                </div>
+                <div class="form-item col-md-6" align="right">
+                  <label style="font-height: 15px;">Time:</label>
+                  <select style="width: 75%;" id="visitTime" name="visitTime" required>
+                    <option disabled selected>--Select--</option>
+                    <option th:each="visitTime : ${visitTimes}"
+                            th:value="${visitTime.time_id}"
+                            th:text="${visitTime.time_name}">Time</option>
+                  </select>
+                </div>
+              </div>
+              <br>
+              <div class="col-md-12" align="right">
+                <button class="col-md-2" type="submit" id="btn" name="button">Schedule</button>
+              </div>
+            </form>
+        </div>
+        <br>
+        <br>
+        <div class="frame2 col-md-12">
+          <div class="salesVisitTable">
+            <h1>Sales Visits</h1>
+            <label for="searchBar"><i class="material-icons">search</i></label>
+            <input type="text" id="visitSearch" placeholder="Search"/>
+            <br>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Customer</th>
+                  <th>Date</th>
+                  <th>Reason for Visit</th>
+                  <th style="width: 10%"></th>
+                  <th style="width: 15%"></th>
+                  </tr>
+              </thead>
+              <tbody>
+                <!--emplpoyeeSalesVisits (List of sales by employee. get employee ID)-->
+                <tr th:each="visit : ${employeeSalesVisits}">
+                  <td th:text="${visit.user.firstName + ' ' + visit.user.lastName}">Employee</td>
+                  <td th:text="${visit.customer.company + ' ' + visit.customer.contact}">Customer</td>
+                  <td th:text="${visit.visit_date}">Date</td>
+                  <td th:text="${visit.time.time_name}">Time</td>
+                  <td th:text="${visit.purpose.purpose_name}">Purpose</td>
+                  <td>
+                    <!-- Button trigger modal -->
+                    <a class="btn btn-danger" href="#" th:href="@{deleteVisit(id=${visit.visit_id})}">
+                        Delete Visit
+                        </a>
+<!--                       <button type="button" class="btn btn-btn-danger">
+                  style="color: #FFFFFF; background-color: #CD5C5C;"
+                    data-toggle="modal" data-target="#exampleModal"
+                     
+                  </button>
+
+                    Modal 
+                    <div class="modal fade modal-lg" id="exampleModal"
+                    tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                    aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">
+                              Deletion Confirmation</h5>
+                            <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                               <input type="hidden" name="_csrf" th:value="${_csrf.token}"/> 
+                            <p>Do you want to permanently delete this scheduled visit?</p>
+                    
+                            <input type="hidden" id="employee"
+                            name="employee" th:value="${visit.user.employee_id}"/>
+                            <input type="hidden" id="visit" name="visit"
+                                th:value="${visit.visit_id}"/> 
+                                <a class="btn btn-danger" href="#" th:href="@{deleteVisit(id=${visit.visit_id})}">  
+                                      Delete
+                                </a>
+                                <span style="padding-left: 10px; padding-right: 10px;">
+                                </span>
+                                <button type="button" class="btn btn-secondary"
+                                data-dismiss="modal">Close</button>
+                           
+                      
+                          </div>
+                        </div>
+                      </div>
+                   </div>-->
+                  </td>
+                    <td>
+                      <a href="#" th:href="@{editVisit(id=${visit.visit_id})}"><button class="btn btn-secondary" type="submit">
+                        Edit Visit Info</button></a>
+                    </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+		 </div>
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+        <script src="js/sales.js"></script>
+    </body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+xmlns:th="http://www.thymeleaf.org"
+xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    
+<head>
+    <div th:replace="fragments/layout:: head-links"></div>
+    <title>Orders</title>
+</head>
+    
+<body>
+    <div class="container"> 
+    <div th:replace="fragments/layout:: navbar"></div>
+    </br>
+        
+        <div class="frame1">  
+            <div class="col-12 text-center m-3">
+                <span class="h3">All Orders</span>					
+            </div>
+				
+            <!--SEARCH BOX with id:orderSearch-->
+            <input type="text" id="orderSearch" placeholder="Type to search"> 
+		<table class="table table-striped" >		  
+                <thead>
+                    <tr>
+                        <th>Order Number</th>
+                        <th>Sales Rep ID</th>
+                        <th>Customer ID</th>
+                        <th>&nbsp;</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+						
+		<!-- BODY OF THE TABLE with id:ordersTable -->
+                <tbody id="ordersTable">
+                    <tr th:each="customerOrder : ${salesRepOrder}">
+                    <td th:text="${customerOrder.orderId}">Order #</td>
+                    <td th:text="${customerOrder.user.employee_id}">Sales Rep Id</td>
+                    <td th:text="${customerOrder.customer.customer_id}">Customer  Id</td>
+                    <td><a href="#" >View/Edit</a></td>
+                    <td><a href="#" >Delete</a></td>
+                    </tr>
+                </table>
+					
+	</div>
+				
+</br>
+        <div class="frame2">
+            <div class="row m-4">
+                <div class="col-3 text-center m-3">
+                    <span class="h3">New Order</span>
+                </div>
+				
+		<!--FORM STARTS HERE -->
+                <div class="col-7 text-center m-3">
+                    <form class="form" action="#"  th:action="@{/customerorders}" method="POST">
+					
+			<!--SALES REP -->
+                        <div class="form-group row">
+                            <label for="user" class="col-3 col-form-label">Sales Rep:</label>
+                            <div class="col-9">
+                                <input th:value="${user.employee_id}"  type="text" name="userId" id="userId" class="form-control" readonly required/>
+                               <!-- <input th:value="${user.employee_id}" type="text" name="user" id="user" class="form-control" required/> -->
+                            </div>
+                        </div>
+						
+                        <!--CUSTOMER -->
+                       <div class="form-group row">
+                            <label for="customer" class="col-3 col-form-label">Customer:</label>
+                            <div class="col-9">
+                                <select class="form-control" name="customer" id="customer">                
+                                    <option th:each="customer: ${customers}"                         
+                                            th:value="${customer.customer_id}" 
+                                             th:text="${customer.customer_id}+ ': ' +${customer.company} + '---'+${customer.contact}">-Customer Id-</option>    
+                                </select>
+                            </div>
+                        </div>
+						
+                        <!--PRODUCT -->
+                        <div class="form-group row">
+                            <label for="product" class="col-3 col-form-label">Product</label>
+                            <div class="col-9">
+                                <select id="product" name="product" class="form-control" >
+                                    <option th:each="product : ${products}" 
+                                            th:value="${product.product_id}" 
+                                            th:text="${product.product_name}+ ' ($' +${product.product_price}+ ')'">-Product-</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!--QUANTITY -->
+                        <div class="form-group row">
+                            <label for="orderQuantity" class="col-3 col-form-label">Quantity</label>
+                            <div class="col-9">
+                                <input th:value="${customerOrder.orderQuantity}" type="number" name="orderQuantity" id="order_quantity" class="form-control" required/>
+                                    <!-- th:value="${order.order_quantity}"-->
+                            </div>
+                        </div>
+                            
+                        <!--PRICE in BigDecimal
+                        <div class="form-group row">
+                            <label for="price" class="col-3 col-form-label">Price</label>
+                            <div class="col-9">
+                                <input type="number" name="price" id="price" min="0" value="0" step=".01" class="form-control" required/>
+                            </div>
+                        </div>	-->			
+						
+                        <!--STATUS -->
+			<div class="form-group row">
+                           <label for="status" class="col-3 col-form-label">Status</label>
+                            <div class="col-9">
+                                <select id="status" name="status" class="form-control" >
+                                    <option th:each="status : ${statuses}" 
+                                            th:value="${status.status_id}" 
+                                            th:text="${status.status_name}">-Status-</option>
+                                </select>
+                            </div>
+                        </div>
+					
+                        <!--SUBMISSION DATE (only visible to Leadership team) -->
+			<div class="form-group row">
+                            <label for="submission_date" class="col-3 col-form-label">
+                                Submission Date</label>
+                            <div class="col-9">
+                                <input th:value="${customerOrder.submission_date}" type="date" name="submission_date" id="submission_date" class="form-control"/>
+                                <!--th:value="${order.submission_date}" -->
+                            </div>
+                        </div>	
+                   
+						
+			<!--NOTES -->
+			<div class="form-group row">
+                            <label for="orderComments" class="col-3 col-form-label">Comments</label>
+                            <div class="col-9">
+                                <textarea th:value="${customerOrder.orderComments}"  name="orderComments" id="orderComments" class="form-control"></textarea>
+                            </div>
+                        </div>
+						
+                        <button type="submit" class="btn btn-secondary">Add Order</button>   
+						
+                    </form>
+                </div>
+            </div>	
+	</div>
+    </div>
+       
+		
+
+    <!-- End main body -->
+    
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="js/searchOrder.js"></script>
+
+</body>
+</html>;
